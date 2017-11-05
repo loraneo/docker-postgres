@@ -12,7 +12,7 @@ RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main" >> /et
 	apt-get install -y postgresql-9.6  	
 
 ENV PATH $PATH:/usr/lib/postgresql/9.6/bin
-ENV PG_DATA /var/lib/postgresql/9.6/application
+ENV PGDATA /var/lib/postgresql/9.6/application
 
 # ADD debezium
 
@@ -48,15 +48,25 @@ RUN git clone https://github.com/eulerto/wal2json -b master --single-branch \
     && make && make install \
     && cd / \
     && rm -rf wal2json
-
+	
 RUN cat /etc/postgresql/9.6/main/pg_hba.conf
 
 USER postgres
-RUN /usr/lib/postgresql/9.6/bin/initdb -D $PG_DATA -E UTF8
+RUN /usr/lib/postgresql/9.6/bin/initdb -D $PGDATA -E UTF8
 
-COPY config/postgresql.conf $PG_DATA/application/postgresql.conf
-COPY config/pg_hba.conf $PG_DATA/application/pg_hba.conf
 
-RUN ls -la  $PG_DATA/application
+RUN cat $PGDATA/postgresql.conf
+COPY config/postgresql.conf $PGDATA/postgresql.conf
+COPY config/pg_hba.conf $PGDATA/pg_hba.conf
 
-CMD /usr/lib/postgresql/9.6/bin/postgres  -D $PG_DATA
+
+RUN echo "preinit" > /tmp/build.log &&\
+	pg_ctl start -D $PGDATA -l /tmp/build.log &&\
+	sleep 3  &&\
+	postgres createuser app_user &&\
+	psql -c "ALTER USER app_user WITH PASSWORD 'app_user_pwd'" &&\
+	createdb -E UTF8 -T template0 app_db &&\
+	psql -c "GRANT ALL PRIVILEGES ON DATABASE app_db to app_user_pwd'" &&\
+	pg_ctl stop
+
+CMD /usr/lib/postgresql/9.6/bin/postgres  -D $PGDATA
