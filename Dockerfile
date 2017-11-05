@@ -63,10 +63,10 @@ COPY config/pg_hba.conf $PGDATA/pg_hba.conf
 RUN echo "preinit" > /tmp/build.log &&\
 	pg_ctl start -D $PGDATA -l /tmp/build.log &&\
 	sleep 3  &&\
-	postgres createuser app_user &&\
+	createuser app_user &&\
 	psql -c "ALTER USER app_user WITH PASSWORD 'app_user_pwd'" &&\
 	createdb -E UTF8 -T template0 app_db &&\
-	psql -c "GRANT ALL PRIVILEGES ON DATABASE app_db to app_user_pwd'" &&\
+	psql -c "GRANT ALL PRIVILEGES ON DATABASE app_db to app_user" &&\
 	pg_ctl stop
 
 CMD /usr/lib/postgresql/9.6/bin/postgres  -D $PGDATA
