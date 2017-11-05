@@ -1,4 +1,4 @@
-FROM debian:stretch
+	FROM debian:stretch
 
 
 RUN apt-get update  &&\
@@ -54,9 +54,9 @@ RUN cat /etc/postgresql/9.6/main/pg_hba.conf
 USER postgres
 RUN /usr/lib/postgresql/9.6/bin/initdb -D $PG_DATA -E UTF8
 
-COPY config/pg_hba.conf $PG_DATA/application/postgresql.conf
+COPY config/postgresql.conf $PG_DATA/application/postgresql.conf
 COPY config/pg_hba.conf $PG_DATA/application/pg_hba.conf
 
 RUN ls -la  $PG_DATA/application
 
-CMD /usr/lib/postgresql/9.6/bin/pg_ctl -D $PG_DATA/application start
+CMD /usr/lib/postgresql/9.6/bin/postgres  -D $PG_DATA
