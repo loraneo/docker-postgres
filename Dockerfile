@@ -64,9 +64,12 @@ RUN echo "preinit" > /tmp/build.log &&\
 	pg_ctl start -D $PGDATA -l /tmp/build.log &&\
 	sleep 3  &&\
 	createuser app_user &&\
+	psql -c "CREATE ROLE replication_user REPLICATION LOGIN;" &&\
 	psql -c "ALTER USER app_user WITH PASSWORD 'app_user_pwd'" &&\
+	psql -c "ALTER USER replication_user WITH PASSWORD 'replication_user_pwd'" &&\
 	createdb -E UTF8 -T template0 app_db &&\
 	psql -c "GRANT ALL PRIVILEGES ON DATABASE app_db to app_user" &&\
+	psql -c "GRANT ALL ON DATABASE app_db to replication_user" &&\
 	pg_ctl stop
 
 CMD /usr/lib/postgresql/9.6/bin/postgres  -D $PGDATA
