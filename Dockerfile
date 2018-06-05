@@ -2,7 +2,7 @@ FROM debian:stretch
 
 
 RUN apt-get update  &&\
-	apt-get install -y wget gnupg2 apt-utils
+	apt-get install -y wget gnupg2 apt-utils curl
 	
 	
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main" >> /etc/apt/sources.list.d/pgdg.list &&\
