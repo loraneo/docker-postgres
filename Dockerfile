@@ -4,9 +4,11 @@ FROM debian:stretch
 RUN apt-get update  &&\
 	apt-get install -y wget gnupg2 apt-utils curl
 	
-	
+
+COPY *.asc /tmp/
+
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main" >> /etc/apt/sources.list.d/pgdg.list &&\
-	curl -o - -q https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - &&\
+	cat /tmp/*.asc | apt-key add - &&\
 	apt-cache search postgresql-9.6 &&\
 	apt-get update &&\
 	apt-get install -y postgresql-9.6  	
